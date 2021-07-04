@@ -4,23 +4,25 @@
 
 rgvlee.Study.FeatureManagementValidation is a working example of validating feature management configuration.
 
-We have a case at Arc Infrastructure where a feature (`ArtIntegration`) depends on another feature (`TrackElements`) being enabled. There are a number of ways this could be handled - from simply ensuring that these dependencies are correctly represented in appsettings through to programmatically enforcing them. YMMV however we've opted to go with the latter as our standard approach.
+We have a case at Arc Infrastructure where a feature (`ArtIntegration`) depends on another feature (`TrackElements`) being turned on. There are a number of ways this could be handled - from simply ensuring that these dependencies are correctly represented in appsettings through to programmatically enforcing them. YMMV however we've opted to go with the latter as our standard approach.
 
 The solution consists of the following:
 
-- An `IFeatureManagerSnapshot` FluentValidation validator. This allows you to form rules such as if Feature A is enabled, Feature B must also be enabled. More complicated rules can be defined as required.
+- An `IFeatureManagerSnapshot` FluentValidation validator. This allows you to form rules such as if Feature A is turned on, Feature B must also be turned on. More complicated rules can be defined as required.
 
 - Middleware to invoke the validator/validate the `IFeatureManagerSnapshot`. If validation fails a `FeatureManagerSnapshotValidationException` populated with the validation result error message/error messages is thrown.
 
 - Startup configuration.
 
-- Middleware tests
+- Middleware tests.
 
 ## Design decisions
 
-- Validation is performed against a feature management entity because features can be enabled via feature filters [[1]].
+> When a feature is evaluated for whether it is on or off, its list of feature-filters are traversed until one of the filters decides the feature should be enabled. At this point the feature is considered enabled and traversal through the feature filters stops. If no feature filter indicates that the feature should be enabled, then it will be considered disabled.<sup>[1]</sup>
+- Therefore validation is performed against a feature management entity.
 
-- The values returned from the standard `IFeatureManager` may change if the `IConfiguration` source which it is pulling from is updated during the request. `IFeatureManagerSnapshot` implements the interface of IFeatureManager, but it caches the first evaluated state of a feature during a request and will return the same state of a feature during its lifetime [[2]]. Therefore validation is performed against `IFeatureManagerSnapshot`.
+> The values returned from the standard IFeatureManager may change if the IConfiguration source which it is pulling from is updated during the request. This can be prevented by using IFeatureManagerSnapshot. IFeatureManagerSnapshot can be retrieved in the same manner as IFeatureManager. IFeatureManagerSnapshot implements the interface of IFeatureManager, but it caches the first evaluated state of a feature during a request and will return the same state of a feature during its lifetime.<sup>[2]</sup>
+- Therefore validation is performed against `IFeatureManagerSnapshot`.
 
 ## Additional implementation information
 
@@ -30,11 +32,12 @@ The solution consists of the following:
 
 ## Testing
 
-- Tests for the middleware are included in `TestProject1`. There are no tests for the validator itself at this point in time.
+- Middleware tests can be found in `TestProject1`.
+- There are no tests for the validator itself at this point in time.
 
 ## Additional considerations
 
-- The state of a feature can vary; for `IFeatureManagerSnapshot`, from one request to the next.
+- The state of a feature can vary; from one request to the next for `IFeatureManagerSnapshot`.
 
 - Depending on your deployment strategy you may want to validate the features outside of the ASP.NET Core request pipeline.
 
