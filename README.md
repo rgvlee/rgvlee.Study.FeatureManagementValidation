@@ -39,7 +39,7 @@ The solution consists of the following:
 
 - The state of a feature can vary; from one request to the next for `IFeatureManagerSnapshot`.
 
-- Depending on your deployment strategy you may want to validate the features outside of the ASP.NET Core request pipeline.
+- Consider whether you need to validate the feature management configuration outside of the ASP.NET Core request pipeline.
 
 [1]: https://github.com/microsoft/FeatureManagement-Dotnet#feature-filters
 [2]: https://github.com/microsoft/FeatureManagement-Dotnet#snapshot
