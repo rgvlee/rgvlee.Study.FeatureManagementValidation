@@ -10,8 +10,8 @@ namespace WebApplication2.Validation
         public FeatureManagerSnapshotValidator()
         {
             RuleFor(x => x)
-                .MustAsync(async (x, cancellation) => await x.IsEnabledAsync("TrackElements"))
-                .WhenAsync(async (x, cancellation) => await x.IsEnabledAsync("ArtIntegration"))
+                .MustAsync(async (x, cancellationToken) => await x.IsEnabledAsync("TrackElements", cancellationToken))
+                .WhenAsync(async (x, cancellationToken) => await x.IsEnabledAsync("ArtIntegration", cancellationToken))
                 .WithMessage("Usage of the ArtIntegration feature requires the TrackElements feature to be enabled.");
         }
     }
